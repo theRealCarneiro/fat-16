@@ -1,5 +1,7 @@
 Para compilar
-`$ make`
+```sh
+$ make
 
 Para executar 
-`./fat_shell`
+```sh
+$ ./fat_shell`
