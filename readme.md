@@ -22,5 +22,5 @@ $ make
 ### Para executar 
 
 ```sh
-$ ./fat_shell`
-```--
+$ ./fat_shell
+```
