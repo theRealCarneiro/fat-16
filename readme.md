@@ -1,9 +1,12 @@
-Para compilar
+# FAT 16
+### Para compilar
 
-```sh
+```
 $ make
+```
 
-Para executar 
+### Para executar 
 
-```sh
+```
 $ ./fat_shell`
+```
