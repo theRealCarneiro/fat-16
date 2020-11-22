@@ -1,17 +1,19 @@
 CC = gcc
 CCFLAGS= 
+SRC_PATH = src/
 
 TARGET = fat_shell
-SRC = fat_shell.c fat.c
-OBJ = ${SRC:.c=.o}
+FILES = fat_shell.c fat.c
+SRC = ${FILES:%.c=$(SRC_PATH)%.c}
+OBJ = ${FILES:.c=.o}
 
-${TARGET}:	${OBJ}
+${TARGET}:	.c.o	${OBJ}
 	${CC} ${OBJ} -o $@ ${CCFLAGS}
 
 .c.o:
 	${CC} -c ${SRC}
 
-${OBJ}:	fat_shell.h fat.h
+${OBJ}:	headers/fat_shell.h headers/fat.h
 
 clean:
 	rm -rf *.o ${TARGET}

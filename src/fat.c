@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <string.h>
-#include "fat.h"
+#include "../headers/fat.h"
 
 /* 8 clusters da tabela FAT, 4096 entradas de 16 bits = 8192 bytes*/
 static uint16_t fat[4096];

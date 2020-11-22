@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include "fat_shell.h"
-#include "fat.h"
+#include "../headers/fat_shell.h"
+#include "../headers/fat.h"
 
 int main(){
 	char comando[256];
