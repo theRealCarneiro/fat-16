@@ -27,4 +27,6 @@ int write();
 int append();
 int read();
 
+int break_dir(char *dir, char ***dir_list);
+
 #endif /* __FAT_H */

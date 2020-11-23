@@ -25,3 +25,4 @@ const char *comandos_disponiveis[] = {
 	"clear",
 	"quit",
 };
+

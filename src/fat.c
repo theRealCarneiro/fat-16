@@ -1,14 +1,17 @@
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 #include "../headers/fat.h"
 
 /* 8 clusters da tabela FAT, 4096 entradas de 16 bits = 8192 bytes*/
 static uint16_t fat[4096];
 static dir_entry_t root_dir[32];
 
+/* diretorios (incluindo ROOT), 32 entradas de diretorio
+com 32 bytes cada = 1024 bytes ou bloco de dados de 1024 bytes*/
 union {
 	dir_entry_t dir[CLUSTER_SIZE / sizeof(dir_entry_t)];
-	uint8_t date[CLUSTER_SIZE];
+	uint8_t data[CLUSTER_SIZE];
 } data_cluster;
 
 int init() {
@@ -71,7 +74,7 @@ int load(){
 	return 0;
 }
 
-int mkdir(char *dir){
+int mkdir(char **dir){
 
 	int i;
 	
@@ -85,7 +88,7 @@ int mkdir(char *dir){
 	}
 
 	dir_entry_t new_dir;
-	strcpy(new_dir.filename, dir);
+	/*strcpy(new_dir.filename, dir);*/
 	/*new_dir.filename = strndup(dir, 18);*/
 	new_dir.attributes = 1;
 
@@ -100,4 +103,39 @@ int mkdir(char *dir){
 		fprintf(stderr, "Erro ao abrir disco FAT fat.part\n");
 		return 1;
 	}
+	return 0;
+}
+
+int break_dir(char *dir, char ***dir_list){
+	if(dir[0] != '/')
+		return -1;
+	/*if(*dir_list != NULL)*/
+		/*free(*dir_list);*/
+	unsigned num_dir = 0;
+	for(int i = 0; dir[i] != '\0' && dir[i] != '\n'; i++){
+		if(dir[i] == '/'){
+			num_dir++;
+		}
+	}
+	
+	//se for direto no root
+	if(num_dir == 1){
+		*dir_list = (char **)malloc(sizeof(char*));
+		(*dir_list)[0] = (char*) malloc(18 * sizeof(char));
+		(*dir_list)[0] = strtok(dir, "/");
+		return 0;
+	}
+
+	*dir_list = (char **)malloc(num_dir * sizeof(char*));
+	for(int i = 0; i < num_dir; i++){
+		(*dir_list)[i] = (char*) malloc(18 * sizeof(char));
+	}
+
+	(*dir_list)[0] = strtok(dir, "/");
+	/*printf("%s\n",(*dir_list)[0]);*/
+	for(int i = 1; i < num_dir; i++){
+		(*dir_list)[i] = strtok(NULL, "/");
+		/*printf("%s\n",(*dir_list)[i]);*/
+	}
+	return 0;
 }
