@@ -38,14 +38,13 @@ int main(){
 							args[1] = strtok(NULL, "");
 							/*break_dir(args[0], &dir_list); //retorna a lista de diretorios*/
 						} else fprintf(stderr, "Comando invalido\n");
-
 					} 
 					else{
 						args[0] = strtok(NULL, "");
 						/*break_dir(args[0], &dir_list);*/
 					}
 				} 
-			} else if(i != 10) //comando incompleto
+			} else if(i != 10 && i != 2) //comando incompleto
 				fprintf(stderr, "Comando invalido\n");
 		}
 
@@ -61,6 +60,10 @@ int main(){
 					load();
 					break;
 				case 2: //ls
+					if(comando == NULL)
+						ls(NULL);
+					else
+						ls(args[0]);
 					break;
 				case 3: ;//mkdir
 					mkdir(args[0]);
