@@ -10,10 +10,6 @@ static dir_entry_t root_dir[32];
 
 /* diretorios (incluindo ROOT), 32 entradas de diretorio
 com 32 bytes cada = 1024 bytes ou bloco de dados de 1024 bytes*/
-union data_cluster{
-	dir_entry_t dir[CLUSTER_SIZE / sizeof(dir_entry_t)];
-	uint8_t data[CLUSTER_SIZE];
-};
  
 typedef union data_cluster data_cluster;
 
@@ -88,7 +84,7 @@ data_cluster get_data_cluster(unsigned index){
 	data_cluster cluster;
 	memset(&cluster, 0, CLUSTER_SIZE);
 
-	fseek(fat_part, 10 * sizeof(data_cluster), SEEK_SET); // Chega aos clusteres de dados.
+	/*fseek(fat_part, 10 * sizeof(data_cluster), SEEK_SET); // Chega aos clusteres de dados.*/
 	fseek(fat_part, index * sizeof(data_cluster), SEEK_CUR); // Vai ao índice desejado.
 	fread(&cluster, sizeof(data_cluster), 1, fat_part); // Lê o cluster e coloca no union.
 	fclose(fat_part);
@@ -107,6 +103,45 @@ void set_data_cluster(unsigned index, data_cluster cluster){
 	fclose(fat_part);
 }
 
+int dir_nav(char **dir_list, int dir_num, int *index, int want){
+	if(dir_list == NULL){ //retorna o index do /
+		*index = 9;
+		return DIR_EXIST;
+	}
+	
+	int i;
+	for(i = 0; i < 32; i++){
+		if(STR_EQUAL(root_dir[i].filename, dir_list[0])) {
+			break;
+		}
+	}
+	if(i == 32)
+		return DIR_NOT_FOUND;
+	
+	*index = root_dir[i].first_block;
+	data_cluster data = get_data_cluster(*index);
+	int j;
+	for(i = 1; i < dir_num - want; i++){
+		for(j = 0; j < 32; j++){
+			if(data.dir[j].first_block != 0 &&
+			   data.dir[j].attributes == 1 &&
+			   STR_EQUAL(data.dir[j].filename, dir_list[i])) {
+				if(i == dir_num - 1 - want) {
+					*index = data.dir[j].first_block;
+				}
+				data = get_data_cluster(data.dir[j].first_block);
+				break;
+			}
+		}
+		if(j == 32)
+			return DIR_NOT_FOUND;
+	}
+	if(want == NEW_DIR || want == NEW_FILE)
+		return DIR_READY;
+	else
+		return DIR_EXIST;
+}
+
 int ls(char *dir){
 
 	FILE *fat_part = fopen("fat.part", "rb+");
@@ -115,29 +150,27 @@ int ls(char *dir){
 		fprintf(stderr, "Erro ao abrir disco FAT fat.part\n");
 		exit(1);
 	}
-	if(dir == NULL){
-		for(int i = 0; i < 32; i++){
-			if(root_dir[i].first_block != 0) {
-				printf("%s ", root_dir[i].filename);
-			}
-		}
-		printf("\n");
-		return 0;
-	}
-
 	char **dir_list = NULL;
-	int i;
+	/*int i;*/
 	int retorno = break_dir(dir, &dir_list);
 	if(retorno == -1){ //Se ouver algum erro
 		return -1;
 	}
-	else if(retorno == 0){ //Se for um diretorio no /
-		for(i = 0; i < 32; i++){
-			if(root_dir[i].first_block != 0) {
-				printf("%s ", root_dir[i].filename);
+	int index;
+	data_cluster data;
+	switch(dir_nav(dir_list, retorno, &index, SEARCH_DIR)){
+		case DIR_NOT_FOUND:
+			fprintf(stderr, "Diretorio nao encontrado\n");
+			break;
+		case DIR_EXIST:
+			data = get_data_cluster(index);
+			for(int i = 0; i < 32; i++){
+				if(data.dir[i].first_block != 0) {
+					printf("%s ", data.dir[i].filename);
+				}
 			}
-		}
-		printf("\n");
+			printf("\n");
+			break;
 	}
 	return 0;
 }
@@ -157,7 +190,12 @@ int mkdir(char *dir){
 	if(retorno == -1){ //Se ouver algum erro
 		return -1;
 	}
-	else if(retorno == 0){ //Se for um diretorio no /
+	int index;
+	data_cluster data;
+	switch(dir_nav(dir_list, retorno, &index, NEW_DIR)){
+	}
+
+	if(retorno == ROOT_DIR){ //Se for um diretorio no /
 
 		for(i = 0; i < 32; i++){
 			if(root_dir[i].first_block == 0) {
@@ -244,17 +282,7 @@ int mkdir(char *dir){
 
 		set_data_cluster(index_to_parent_dir, data);
 		set_data_cluster(block, new_dir);
-		
-
-		/*fseek(fat_part, (index - 10) * CLUSTER_SIZE, SEEK_CUR);*/
-		/*fwrite(data.dir, sizeof(dir_entry_t), 32, fat_part);*/
-
-		/*fseek(fat_part, CLUSTER_SIZE * block, SEEK_SET); */
-		/*fwrite(new_dir, sizeof(dir_entry_t), 32, fat_part);*/
 	}
-
-	
-
 
 	/*dir_entry_t new_dir;*/
 	/*strcpy(new_dir.filename, dir);*/
@@ -273,6 +301,8 @@ int mkdir(char *dir){
 }
 
 int break_dir(char *dir, char ***dir_list){
+	if(dir == NULL || (dir[0] == '/' && strlen(dir) == 1))
+		return ROOT_DIR;
 	if(dir[0] != '/')
 		return -1;
 	/*if(*dir_list != NULL)*/

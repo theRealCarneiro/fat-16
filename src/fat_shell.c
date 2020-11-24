@@ -20,7 +20,7 @@ int main(){
 		short tamanho_comando = strlen(comando);
 		char *primeiro_comando = strtok(comando, " ");
 			
-		char *args[2];
+		char *args[2] = {"\0","\0"};
 		int i;
 		/*char **dir_list = NULL;*/
 		for(i = 0; i < 10 && strcmp(primeiro_comando, comandos_disponiveis[i]) != 0; i++);
@@ -60,9 +60,10 @@ int main(){
 					load();
 					break;
 				case 2: //ls
-					if(comando == NULL)
+					if(args[0][0] == '\0'){
 						ls(NULL);
-					else
+						/*printf("aa");*/
+					}else
 						ls(args[0]);
 					break;
 				case 3: ;//mkdir
