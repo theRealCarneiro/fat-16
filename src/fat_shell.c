@@ -19,79 +19,92 @@ int main(){
 
 		short tamanho_comando = strlen(comando);
 		char *primeiro_comando = strtok(comando, " ");
-			
+
 		char *args[2] = {"\0","\0"};
+			
 		int i;
-		/*char **dir_list = NULL;*/
-		for(i = 0; i < 10 && strcmp(primeiro_comando, comandos_disponiveis[i]) != 0; i++);
+		for(i = 0; i < 11 && strcmp(primeiro_comando, comandos_disponiveis[i]) != 0; i++);
+		char *aux;
 
-		if(i > 1){ //Se nao for init nem load
-
-			if(tamanho_comando != strlen(primeiro_comando)){ //Se o comando nao estiver incompleto
-
+		if(i > 1){ //Se não for init nem load
+			if(i < 11 && tamanho_comando != strlen(comandos_disponiveis[i])){ //Se o comando não estiver incompleto
 				if(comando != NULL){
-
 					if(i == 6 || i == 7){ //write e append
 						args[0] = strtok(NULL, "\" "); //recebe a string
 
-						if(comando != NULL){ //caso o comando nao esteja incompleto
+						if(comando != NULL){ //caso o comando não esteja incompleto
 							args[1] = strtok(NULL, "");
-							/*break_dir(args[0], &dir_list); //retorna a lista de diretorios*/
-						} else fprintf(stderr, "Comando invalido\n");
+							args[1][strcspn(args[1], " ")] = '\0';
+						} else fprintf(stderr, "Comando inválido\n");
 					} 
-					else{
-						args[0] = strtok(NULL, "");
-						/*break_dir(args[0], &dir_list);*/
+					else{ //
+						aux = strtok(NULL, " ");
+						if(aux != NULL)
+							args[0] = aux;
+						aux = strtok(NULL, "");
+						if(aux != NULL){
+							fprintf(stderr, "Não pode haver espaco no nome de um diretorio\n");
+							i = -1;
+						}
 					}
 				} 
 			} else if(i != 10 && i != 2) //comando incompleto
-				fprintf(stderr, "Comando invalido\n");
+				fprintf(stderr, "Comando inválido\n");
 		}
-
 			
-		
-			
-		if(i < 11){
-			switch(i){
-				case 0: //init
-					init();
-					break;
-				case 1: //load
-					load();
-					break;
-				case 2: //ls
-					if(args[0][0] == '\0'){
-						ls(NULL);
-						/*printf("aa");*/
-					}else
-						ls(args[0]);
-					break;
-				case 3: ;//mkdir
-					mkdir(args[0]);
-					break;
-				case 4: //create
-					break;
-				case 5: //unlink
-					break;
-				case 6: //write
-					printf("%s\n",args[0]);
-					break;
-				case 7: //append
-					break;
-				case 8: //read
-					break;
-				case 9: //clear
-					system("clear");
-					break;
-				case 10: //quit
-					break;
-			}
+		switch(i){
+			case 0: //init
+				init();
+				break;
+			case 1: //load
+				load();
+				break;
+			case 2: //ls
+				if(args[0][0] == '\0'){
+					ls(NULL);
+					/*printf("aa");*/
+				}else
+					ls(args[0]);
+				break;
+			case 3: ;//mkdir
+				/*printf("%s",args[0]);*/
+				mkdir(args[0]);
+				break;
+			case 4: //create
+				create(args[0]);
+				break;
+			case 5: //unlink
+				unlink(args[0]);
+				break;
+			case 6: //write
+				args[0] = strtok(NULL, "\" "); //recebe a string
+				if(comando != NULL){ //caso o comando não esteja incompleto
+					args[1] = strtok(NULL, "");
+				} else fprintf(stderr, "Comando inválido\n");
+				/*printf("%s\n",args[0]);*/
+				break;
+			case 7: //append
+				args[0] = strtok(NULL, "\" "); //recebe a string
+				if(comando != NULL){ //caso o comando não esteja incompleto
+					args[1] = strtok(NULL, "");
+				} else fprintf(stderr, "Comando inválido\n");
+				/*printf("append");*/
+				break;
+			case 8: //read
+				printf("read");
+				break;
+			case 9: //clear
+				system("clear");
+				break;
+			case 10: //quit
+				/*exit(0);*/
+				break;
+			/*default:*/
+				/*printf("Comando não encontrado\n");*/
+				/*break;*/
 		}
-		else
-			printf("Comando não encontrado\n");
-		/*free(dir_list);*/
 	}
-	while(strcmp(comando, "quit") != 0);
+	while(strcmp(comando, "quit"));
 	return 0;
 }
 

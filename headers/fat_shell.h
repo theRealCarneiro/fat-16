@@ -1,17 +1,27 @@
-#define STR_EQUAL(a,b) strcmp(a,b) == 0
-#define STR(X) #X
+//#ifndef __FAT_SHELL_H
+//#define __FAT_SHELL_H
 
-#define VERMELHO STR(\031[0;31m)
-#define VERDE STR(\033[0;32m)
-#define AMARELO STR(\033[0;33m)
-#define AZUL STR(\033[0;34m)
-#define MAGENTA STR(\033[0;35m)
-#define CIANO STR(\033[0;36m)
-#define CLEAR STR(\033[0m)
+//		testa se strings sao iguais
+#define	STR_EQUAL(a,b)	strcmp(a,b) == 0
 
-#define USER_SYMBLE "$ "
+//		transforma o texto em uma string
+#define	STR(TEXTO)	#TEXTO 
 
-const char *PS1 = MAGENTA USER_SYMBLE CLEAR;
+//		funcao		escape para a cor	texto	//reseta a cor
+#define	VERMELHO(X)	STR(\033[0;31m)	X		STR(\033[0m)
+#define	VERDE(X)		STR(\033[0;32m)	X		STR(\033[0m)
+#define	AMARELO(X)	STR(\033[0;33m)	X		STR(\033[0m)
+#define	AZUL(X)		STR(\033[0;34m)	X		STR(\033[0m)
+#define	MAGENTA(X)	STR(\033[0;35m)	X		STR(\033[0m)
+#define	CIANO(X)		STR(\033[0;36m)	X		STR(\033[0m)
+#define	BRANCO(X)		STR(\033[0;37m)	X		STR(\033[0m)
+#define	CLEAR(X)		STR(\033[0m)		X		
+
+#define USER_SYMBLE " $ "
+#define MESSAGE "fatshell"
+
+const char *PS1 = CLEAR(MESSAGE) AZUL(USER_SYMBLE);
+
 const char *comandos_disponiveis[] = {
 	"init",
 	"load",
@@ -26,3 +36,4 @@ const char *comandos_disponiveis[] = {
 	"quit",
 };
 
+//#endif /* __FAT_SHELL_H */
