@@ -1,16 +1,18 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include "../headers/fat_shell.h"
 #include "../headers/fat.h"
+#include "../headers/fat_shell.h"
+
+int fs_loaded;
 
 int main(){
-	char comando[256];
+	char comando[CMD_SIZE];
 
 	do {
 		do{
 			printf(PS1);
-			if(fgets(comando, 256, stdin) == NULL){
+			if(fgets(comando, CMD_SIZE, stdin) == NULL){
 				fprintf(stderr, "Erro ao ler entrada\n");
 				return(-1);
 			} 
@@ -26,15 +28,23 @@ int main(){
 		for(i = 0; i < 11 && strcmp(primeiro_comando, comandos_disponiveis[i]) != 0; i++);
 		char *aux;
 
+		if(i > 1 && i != 9 && i != 10 && fs_loaded == 0){
+			fprintf(stderr, "Erro, sistema de arquivos não foi carregado, use o comando init ou load para iniciar\n");
+			i = -1;
+		}
+
 		if(i > 1){ //Se não for init nem load
 			if(i < 11 && tamanho_comando != strlen(comandos_disponiveis[i])){ //Se o comando não estiver incompleto
 				if(comando != NULL){
 					if(i == 6 || i == 7){ //write e append
-						args[0] = strtok(NULL, "\" "); //recebe a string
+						aux = strtok(NULL, "\""); //recebe a string
+						if(aux != NULL)
+							args[0] = aux;
 
 						if(comando != NULL){ //caso o comando não esteja incompleto
-							args[1] = strtok(NULL, "");
-							args[1][strcspn(args[1], " ")] = '\0';
+							aux = strtok(NULL, "");
+							if(aux != NULL)
+								args[1] = aux;
 						} else fprintf(stderr, "Comando inválido\n");
 					} 
 					else{ //
@@ -54,9 +64,11 @@ int main(){
 			
 		switch(i){
 			case 0: //init
+				fs_loaded = 1;
 				init();
 				break;
 			case 1: //load
+				fs_loaded = 1;
 				load();
 				break;
 			case 2: //ls
@@ -76,22 +88,16 @@ int main(){
 			case 5: //unlink
 				unlink(args[0]);
 				break;
-			case 6: //write
-				args[0] = strtok(NULL, "\" "); //recebe a string
-				if(comando != NULL){ //caso o comando não esteja incompleto
-					args[1] = strtok(NULL, "");
-				} else fprintf(stderr, "Comando inválido\n");
-				/*printf("%s\n",args[0]);*/
+			case 6: ;//write
+				/*args[0][strlen(args[0]) - 1] = '\0'; */
+				write(args[0], &args[1][1]);
 				break;
 			case 7: //append
-				args[0] = strtok(NULL, "\" "); //recebe a string
-				if(comando != NULL){ //caso o comando não esteja incompleto
-					args[1] = strtok(NULL, "");
-				} else fprintf(stderr, "Comando inválido\n");
+				append(strtok(args[0], "\""), &args[1][1]);
 				/*printf("append");*/
 				break;
 			case 8: //read
-				printf("read");
+				read(args[0]);
 				break;
 			case 9: //clear
 				system("clear");
