@@ -385,7 +385,7 @@ int unlink(char *dir){
 								data.dir[i] = aux;
 								write_data_cluster(index, data);
 								save_fat();
-								printf("Diretório removido com sucesso");
+								printf("Diretório removido com sucesso\n");
 							}
 						} 
 						else{ //se for um arquivo
@@ -398,7 +398,7 @@ int unlink(char *dir){
 							data.dir[i] = aux; // recebe uma entrada de diretorio vazia
 							write_data_cluster(index, data); //grava o diretorio pai no disco
 							save_fat();
-							printf("Arquivo removido com sucesso");
+							printf("Arquivo removido com sucesso\n");
 						}
 					}
 				}

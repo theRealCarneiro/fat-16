@@ -5,7 +5,7 @@
 | Comando                 | Descrição                                         |
 | ----------------------- | ------------------------------------------------- |
 | init                    | inicializa o sistema de arquivos em branco        |
-| load                    | carregga um sistema de arquivos do disco          |
+| load                    | carrega um sistema de arquivos do disco           |
 | mkdir  [path]           | lista diretório                                   |
 | create [path]           | cria diretório                                    |
 | unlink [path]           | exclui arquivo ou diretório                       |
@@ -26,3 +26,9 @@ $ make
 ```sh
 $ ./fat_shell
 ```
+
+### Para ler o manual 
+```sh
+$ man ./fat_shell.1
+```
+Link para o repositório no github: https://github.com/theRealCarneiro/fat-16
