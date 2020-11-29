@@ -13,7 +13,7 @@
 | append "string" [path]  | anexa dados em um arquivo                         |
 | read   [path]           | le conteúdo de um arquivo                         |
 | cd     [path]           | vai ao diretório especificado                     |
-| help                    | vai ao diretório especificado                     |
+| help                    | exibe informações sobre os comandos               |
 | quit                    | sai do programa                                   |
 
 ### Para compilar
