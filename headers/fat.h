@@ -22,23 +22,52 @@ union data_cluster{
 	uint8_t data[CLUSTER_SIZE];
 };
 
-int init(); 
-int load(); 
-int ls(char *dir); 
-int mkdir(char *dir);  
-int create(char *dir); 
-int unlink(char *dir); 
+/* inicialza o sistema de arquivos */
+int init() ;
+
+/* carrega a tabela fat e o diretorio raiz para a memoria principal */
+int load();
+
+/* le um cluster de memoria no disco */
+data_cluster read_data_cluster(unsigned index);
+
+/* grava um cluster no disco */
+void write_data_cluster(unsigned index, data_cluster cluster);
+
+/* navega no sistema de arquivos */
+int dir_nav(char **dir_list, int dir_num, int *index, int want);
+
+/*imprime na tela os diretorios e arquivos de um determinado diretorio*/
+int ls(char *dir);
+
+/*cria um novo diretorio*/
+int mkdir(char *dir);
+
+/*cria um arquivo*/
+int create(char *dir);
+
+/*deleta um arquivo ou diretorio*/
+int unlink(char *dir);
+
+/*escreve uma string em um arquivo*/
 int write(char *string, char *dir);
+
+/*concatena uma string em um arquivo*/
 int append(char *string, char *dir);
+
+/*le um arquivo e imprime na tela*/
 int read(char *dir);
 
-data_cluster read_data_cluster(unsigned index);
-void write_data_cluster(unsigned index, data_cluster cluster);
-int dir_nav(char **dir_list, int dir_num, int *index, int want);
+/*quebra um caminho de diretorio em varias strings*/
 int break_dir(char *dir, char ***dir_list);
+
+/*grava a tabela fat no disco*/
 int save_fat();
+
+/*quebra uma string em varios clusters*/
 int break_str_into_clusters(char *string, data_cluster **buffer);
 
+//define o diretorio atual
 int cd(char *dir);
 
 // retorno
@@ -51,11 +80,7 @@ int cd(char *dir);
 #define NOT_A_FILE		6
 
 // request
-#define NEW_DIR		1
-#define NEW_FILE		1
-#define UNLINK_DIR		1
-#define WRITE_TO_FILE	1
-#define SEARCH_DIR		0
-
+#define WANT_CLUSTER	0
+#define WANT_PARENT		1
 
 #endif /* __FAT_H */

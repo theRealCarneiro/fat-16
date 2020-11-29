@@ -20,7 +20,7 @@
 #define USER_SYMBLE " $ "
 #define MESSAGE "fatshell"
 
-const char *PS1 = VERMELHO(USER_SYMBLE);
+const char *PS1 = VERDE(USER_SYMBLE);
 
 const char *comandos_disponiveis[] = {
 	"init",

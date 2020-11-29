@@ -138,7 +138,7 @@ int dir_nav(char **dir_list, int dir_num, int *index, int want){
 		if(j == 32)
 			return DIR_NOT_FOUND;
 	}
-	if(want == NEW_DIR || want == NEW_FILE)
+	if(want == WANT_PARENT || want == WANT_PARENT)
 		return DIR_READY;
 	else
 		return DIR_EXIST;
@@ -163,7 +163,7 @@ int ls(char *dir){
 	}
 	int index;
 	data_cluster data;
-	switch(dir_nav(dir_list, retorno, &index, SEARCH_DIR)){
+	switch(dir_nav(dir_list, retorno, &index, WANT_CLUSTER)){
 		case DIR_NOT_FOUND:
 			fprintf(stderr, "Diretório não encontrado\n");
 			break;
@@ -206,7 +206,7 @@ int mkdir(char *dir){
 	}
 	int index;
 	data_cluster data;
-	switch(dir_nav(dir_list, retorno, &index, NEW_DIR)){
+	switch(dir_nav(dir_list, retorno, &index, WANT_PARENT)){
 		case DIR_NOT_FOUND:
 			fprintf(stderr, "Diretorio nao encontrado\n");
 			break;
@@ -282,7 +282,7 @@ int create(char *dir){
 	}
 	int index;
 	data_cluster data;
-	switch(dir_nav(dir_list, retorno, &index, NEW_DIR)){
+	switch(dir_nav(dir_list, retorno, &index, WANT_PARENT)){
 		case DIR_NOT_FOUND:
 			fprintf(stderr, "Diretorio nao encontrado\n");
 			break;
@@ -361,7 +361,7 @@ int unlink(char *dir){
 	if(pos < 0)
 		pos = 0;
 	dir_entry_t aux;
-	switch(dir_nav(dir_list, retorno, &index, UNLINK_DIR)){
+	switch(dir_nav(dir_list, retorno, &index, WANT_PARENT)){
 		case DIR_NOT_FOUND:
 			fprintf(stderr, "Diretório/Arquivo não encontrado\n");
 			break;
@@ -428,7 +428,7 @@ int write(char *string, char *dir){
 	int index;
 	int num_buffer;
 	data_cluster *buffer;
-	switch(dir_nav(dir_list, retorno, &index, SEARCH_DIR)){
+	switch(dir_nav(dir_list, retorno, &index, WANT_CLUSTER)){
 		case NOT_A_DIR: 
 			/*quebra a string em clusters de 1024 bytes*/
 			num_buffer = break_str_into_clusters(string, &buffer); 
@@ -491,7 +491,7 @@ int append(char *string, char *dir){
 	data_cluster *buffer;
 	int file_size;
 	int num_buffer;
-	switch(dir_nav(dir_list, retorno, &index, SEARCH_DIR)){
+	switch(dir_nav(dir_list, retorno, &index, WANT_CLUSTER)){
 		case NOT_A_DIR:
 			/*procura o ultimo cluster do arquivo*/
 			while(fat[index] != 0xffff){ 
@@ -569,7 +569,7 @@ int read(char *dir){
 	data_cluster data;
 	uint8_t buffer[1025];
 	memset(buffer, 0, 1025);
-	switch(dir_nav(dir_list, retorno, &index, SEARCH_DIR)){
+	switch(dir_nav(dir_list, retorno, &index, WANT_CLUSTER)){
 		case DIR_NOT_FOUND:
 			fprintf(stderr, "Arquivo não encontrado\n");
 			break;
