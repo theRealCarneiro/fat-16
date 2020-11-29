@@ -1,0 +1,39 @@
+.\" Manpage for nuseradd.
+.\" Contact vivek@nixcraft.net.in to correct errors or typos.
+.TH man 1 "29 Nov 2020" "1.0" "fat-16 manpage"
+.SH NAME
+fat-16 \- cria um sistema de arquivos virtual 
+.SH SYNOPSIS
+\ ./fat_shell
+.SH DESCRIPTION
+Cria um sistema de arquivos fat de 16 bits em um arquivo binário
+.SH OPTIONS
+O executavel não leva nenhum argumento, todos os comandos são feitos dentro do próprio shell
+.SH SHELL OPTIONS
+init					inicializa o sistema de arquivos em branco.  
+
+load					carregga um sistema de arquivos do disco.  
+
+mkdir  [path]			lista diretório.  
+
+create [path]			cria diretório.  
+
+unlink [path]			exclui arquivo ou diretório.  
+
+write  "string" [path]	sobrescreve dados em um arquivo.  
+
+append "string" [path]	anexa dados em um arquivo.  
+
+read   [path]			le conteúdo de um arquivo.  
+
+cd     [path]			vai ao diretório especificado.  
+
+quit					sai do programa.  
+.SH BUGS
+No known bugs.
+.SH AUTHOR
+Gabriel Carneiro (gabriel.chaves.carneiro@gmail.com)
+
+André Luis (dedasgdias@gmail.com)
+
+Filipe Samuel

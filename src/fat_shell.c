@@ -34,12 +34,12 @@ int main(){
 			
 		/*checa se o comando existe*/
 		int i;
-		for(i = 0; i < 12 && strcmp(primeiro_comando, comandos_disponiveis[i]) != 0; i++);
+		for(i = 0; i < 13 && strcmp(primeiro_comando, comandos_disponiveis[i]) != 0; i++);
 		char *aux;
 
 		//caso o sistema de arquivo não tenha sido inicializado 
-		if((i > 1 && i != 9 && i != 11 || i > 11) && fs_loaded == 0){
-			fprintf(stderr, "Erro, sistema de arquivos não foi carregado, use o comando init ou load para iniciar\n");
+		if((i > 1 && i != 9 && i != 11 && i != 12 || i > 12) && fs_loaded == 0){
+			fprintf(stderr, "Erro, sistema de arquivos não foi carregado, use o comando init ou load para iniciar, ou help para uma lista de comandos\n");
 			i = -1;
 		}
 
@@ -131,6 +131,21 @@ int main(){
 			case 10: //cd
 				cd(args[0]);
 				break;
+			case 11: //help
+				printf("| Comando                 | Descrição                                         |\n");
+				printf("| ----------------------- | ------------------------------------------------- |\n");
+				printf("| init                    | inicializa o sistema de arquivos em branco        |\n");
+				printf("| load                    | carregga um sistema de arquivos do disco          |\n");
+				printf("| mkdir  [path]           | lista diretório                                   |\n");
+				printf("| create [path]           | cria diretório                                    |\n");
+				printf("| unlink [path]           | exclui arquivo ou diretório                       |\n");
+				printf("| write  \"string\" [path]  | sobrescreve dados em um arquivo                   |\n");
+				printf("| append \"string\" [path]  | anexa dados em um arquivo                         |\n");
+				printf("| read   [path]           | le conteúdo de um arquivo                         |\n");
+				printf("| cd     [path]           | vai ao diretório especificado                     |\n");
+				printf("| quit                    | sai do programa                                   |\n");
+				break;
+
 		}
 	}
 	while(strcmp(comando, "quit"));

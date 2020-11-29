@@ -34,6 +34,7 @@ const char *comandos_disponiveis[] = {
 	"read",
 	"clear",
 	"cd",
+	"help",
 	"quit",
 };
 
