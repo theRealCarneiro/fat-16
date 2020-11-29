@@ -20,9 +20,7 @@
 #define USER_SYMBLE " $ "
 #define MESSAGE "fatshell"
 
-#define CMD_SIZE 4096
-
-const char *PS1 = CLEAR(MESSAGE) VERMELHO(USER_SYMBLE);
+const char *PS1 = VERMELHO(USER_SYMBLE);
 
 const char *comandos_disponiveis[] = {
 	"init",
@@ -35,6 +33,7 @@ const char *comandos_disponiveis[] = {
 	"append",
 	"read",
 	"clear",
+	"cd",
 	"quit",
 };
 

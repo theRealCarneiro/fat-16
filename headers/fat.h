@@ -39,6 +39,8 @@ int break_dir(char *dir, char ***dir_list);
 int save_fat();
 int break_str_into_clusters(char *string, data_cluster **buffer);
 
+int cd(char *dir);
+
 // retorno
 #define ROOT_DIR		0
 #define DIR_NOT_FOUND	1

@@ -4,13 +4,23 @@
 #include "../headers/fat.h"
 #include "../headers/fat_shell.h"
 
-int fs_loaded;
+#define CMD_SIZE 4096
+#define DIR_PATH_SIZE 4096
+
+int fs_loaded = 0;
+char cur_dir[256] = "/";
 
 int main(){
 	char comando[CMD_SIZE];
+	char **args = (char**)malloc(sizeof(char*) * 2);
+	args[0] = (char*)malloc(sizeof(char) * CMD_SIZE);
+	args[1] = (char*)malloc(sizeof(char) * CMD_SIZE);
+	memset(args[0], 0, CMD_SIZE);
+	memset(args[1], 0, CMD_SIZE);
 
 	do {
 		do{
+			printf(AZUL("%s"), cur_dir);
 			printf(PS1);
 			if(fgets(comando, CMD_SIZE, stdin) == NULL){
 				fprintf(stderr, "Erro ao ler entrada\n");
@@ -22,35 +32,58 @@ int main(){
 		short tamanho_comando = strlen(comando);
 		char *primeiro_comando = strtok(comando, " ");
 
-		char *args[2] = {"\0","\0"};
+		/*char *args[2] = {"\0","\0"};*/
 			
 		int i;
-		for(i = 0; i < 11 && strcmp(primeiro_comando, comandos_disponiveis[i]) != 0; i++);
+		for(i = 0; i < 12 && strcmp(primeiro_comando, comandos_disponiveis[i]) != 0; i++);
 		char *aux;
 
-		if(i > 1 && i != 9 && i != 10 && fs_loaded == 0){
+		if((i > 1 && i != 9 && i != 11 || i > 11) && fs_loaded == 0){
 			fprintf(stderr, "Erro, sistema de arquivos não foi carregado, use o comando init ou load para iniciar\n");
 			i = -1;
 		}
 
-		if(i > 1){ //Se não for init nem load
-			if(i < 11 && tamanho_comando != strlen(comandos_disponiveis[i])){ //Se o comando não estiver incompleto
+		if(i > 1 && i < 11){ //Se não for init nem load
+			/*if(i < 12){ //Se o comando não estiver incompleto*/
 				if(comando != NULL){
 					if(i == 6 || i == 7){ //write e append
 						aux = strtok(NULL, "\""); //recebe a string
 						if(aux != NULL)
-							args[0] = aux;
+							strcpy(args[0],aux);
 
 						if(comando != NULL){ //caso o comando não esteja incompleto
 							aux = strtok(NULL, "");
 							if(aux != NULL)
-								args[1] = aux;
+								if(aux[0] != '/'){
+									if(strcmp(cur_dir, "/") != 0)
+										snprintf(args[1], strlen(cur_dir) + strlen(aux) + 2,"%s/%s", cur_dir, &aux[1]);
+									else
+										snprintf(args[1], strlen(aux) + 2,"/%s", &aux[1]);
+								}
+								else
+									strcpy(args[1], aux);
+
+							printf("%s %s\n",args[0], args[1]);
 						} else fprintf(stderr, "Comando inválido\n");
 					} 
 					else{ //
 						aux = strtok(NULL, " ");
-						if(aux != NULL)
-							args[0] = aux;
+						/*printf("%s", aux);*/
+						if(aux != NULL){
+							if(aux[0] != '/'){
+								if(strcmp(cur_dir, "/") != 0)
+									snprintf(args[0], strlen(cur_dir) + strlen(aux) + 2,"%s/%s", cur_dir, aux);
+								else
+									snprintf(args[0], strlen(aux) + 2,"/%s", aux);
+							}
+							else
+								strcpy(args[0], aux);
+						} 
+						else if(i != 2)
+							fprintf(stderr, "Comando inválido\n");
+						else 
+							strcpy(args[0], cur_dir);
+
 						aux = strtok(NULL, "");
 						if(aux != NULL){
 							fprintf(stderr, "Não pode haver espaco no nome de um diretorio\n");
@@ -58,8 +91,7 @@ int main(){
 						}
 					}
 				} 
-			} else if(i != 10 && i != 2) //comando incompleto
-				fprintf(stderr, "Comando inválido\n");
+			/*} */
 		}
 			
 		switch(i){
@@ -74,12 +106,12 @@ int main(){
 			case 2: //ls
 				if(args[0][0] == '\0'){
 					ls(NULL);
-					/*printf("aa");*/
 				}else
 					ls(args[0]);
 				break;
 			case 3: ;//mkdir
-				/*printf("%s",args[0]);*/
+				/*printf("%s!\n",args[0]);*/
+				   /*exit(1);*/
 				mkdir(args[0]);
 				break;
 			case 4: //create
@@ -90,10 +122,10 @@ int main(){
 				break;
 			case 6: ;//write
 				/*args[0][strlen(args[0]) - 1] = '\0'; */
-				write(args[0], &args[1][1]);
+				write(args[0], args[1]);
 				break;
 			case 7: //append
-				append(strtok(args[0], "\""), &args[1][1]);
+				append(args[0], args[1]);
 				/*printf("append");*/
 				break;
 			case 8: //read
@@ -102,7 +134,10 @@ int main(){
 			case 9: //clear
 				system("clear");
 				break;
-			case 10: //quit
+			case 10: //cd
+				cd(args[0]);
+				break;
+			case 11: //quit
 				/*exit(0);*/
 				break;
 			/*default:*/
@@ -114,3 +149,33 @@ int main(){
 	return 0;
 }
 
+int cd(char *dir){
+
+	FILE *fat_part = fopen("fat.part", "rb+");
+	char aux[256];
+	strcpy(aux, dir);
+	if(fat_part == NULL) {
+		fprintf(stderr, "Erro ao abrir disco FAT fat.part\n");
+		exit(1);
+	}
+	char **dir_list = NULL;
+	int retorno = break_dir(aux, &dir_list);
+	if(retorno == -1){ //Se ouver algum erro
+		return -1;
+	}
+	int index;
+	switch(dir_nav(dir_list, retorno, &index, SEARCH_DIR)){
+		case DIR_EXIST:
+			memset(cur_dir, 0, 256);
+			strncpy(cur_dir, dir, strlen(dir) + 1);
+			break;
+		case DIR_NOT_FOUND:
+			fprintf(stderr, "Diretório não encontrado\n");
+			break;
+		case NOT_A_DIR:
+			fprintf(stderr, "Não é um diretório\n");
+			break;
+	}
+	free(dir_list);
+	return 0;
+}
