@@ -8,7 +8,7 @@
 static uint16_t fat[4096];
 static dir_entry_t root_dir[32];
 
-/* inicialza o sistema de arquivos */
+/* inicialza o sistema de arquivos O(n)*/
 int init() {
 	FILE *fat_part = fopen("fat.part", "wb");
 
@@ -49,7 +49,7 @@ int init() {
 	return 0;
 }
 
-/* carrega a tabela fat e o diretorio raiz para a memoria principal */
+/* carrega a tabela fat e o diretorio raiz para a memoria principal O(1)*/
 int load(){
 	FILE *fat_part = fopen("fat.part", "rb+");
 
@@ -71,7 +71,7 @@ int load(){
 	return 0;
 }
 
-/* le um cluster de memoria no disco */
+/* le um cluster de memoria no disco O(1)*/
 data_cluster read_data_cluster(unsigned index){
 	FILE *fat_part = fopen("fat.part", "rb+");
 	if(fat_part == NULL) {
@@ -89,7 +89,7 @@ data_cluster read_data_cluster(unsigned index){
 	return cluster;
 }
 
-/* grava um cluster no disco */
+/* grava um cluster no disco O(1)*/
 void write_data_cluster(unsigned index, data_cluster cluster){
 	FILE *fat_part = fopen("fat.part", "rb+");
 	if(fat_part == NULL) {
@@ -101,7 +101,7 @@ void write_data_cluster(unsigned index, data_cluster cluster){
 	fclose(fat_part);
 }
 
-/* navega no sistema de arquivos */
+/* navega no sistema de arquivos O(n*m)*/
 int dir_nav(char **dir_list, int dir_num, int *index, int want){
 	if(dir_list == NULL){ //retorna o index do /
 		*index = 9;
@@ -144,7 +144,7 @@ int dir_nav(char **dir_list, int dir_num, int *index, int want){
 		return DIR_EXIST;
 }
 
-/*imprime na tela os diretorios e arquivos de um determinado diretorio*/
+/*imprime na tela os diretorios e arquivos de um determinado diretorio O(n), sendo o pior caso com n = 32*/
 int ls(char *dir){
 	/*inclui as definições de cores*/
 	#include "../headers/fat_shell.h"
@@ -187,7 +187,7 @@ int ls(char *dir){
 	return 0;
 }
 
-/*cria um novo diretorio*/
+/*cria um novo diretorio O(n), sendo n o numero de blocos ate encontrar um bloco livre*/
 int mkdir(char *dir){
 
 	FILE *fat_part = fopen("fat.part", "rb+");
@@ -264,7 +264,7 @@ int mkdir(char *dir){
 	return 0;
 }
 
-/*cria um arquivo*/
+/*cria um arquivo O(n), sendo n o numero de blocos ate encontrar um bloco livre*/
 int create(char *dir){
 
 	FILE *fat_part = fopen("fat.part", "rb+");
@@ -340,7 +340,7 @@ int create(char *dir){
 	return 0;
 }
 
-/*deleta um arquivo ou diretorio*/
+/*deleta um arquivo ou diretorio, O(n) com n = ao numero de blocos do arquivo a ser deletado*/
 int unlink(char *dir){
 
 	FILE *fat_part = fopen("fat.part", "rb+");
@@ -408,7 +408,7 @@ int unlink(char *dir){
 	return 0;
 }
 
-/*escreve uma string em um arquivo*/
+/*escreve uma string em um arquivo O(n), com n = ao numero de blocos necessarios para escrever o arquivo*/
 int write(char *string, char *dir){
 
 	FILE *fat_part = fopen("fat.part", "rb+");
@@ -469,7 +469,7 @@ int write(char *string, char *dir){
 	return 0;
 }
 
-/*concatena uma string em um arquivo*/
+/*concatena uma string em um arquivo O(n), com n = ao numero de blocos necessarios para o arquivo*/
 int append(char *string, char *dir){
 
 	FILE *fat_part = fopen("fat.part", "rb+");
@@ -549,7 +549,7 @@ int append(char *string, char *dir){
 	return 0;
 }
 
-/*le um arquivo e imprime na tela*/
+/*le um arquivo e imprime na tela O(n) com n = ao numero de blocos a serem imprimidos*/
 int read(char *dir){
 	FILE *fat_part = fopen("fat.part", "rb+");
 
@@ -595,7 +595,7 @@ int read(char *dir){
 	return 0;
 }
 
-/*quebra um caminho de diretorio em varias strings*/
+/*quebra um caminho de diretorio em varias strings, O(n) com n = ao numero de diretorios no caminho*/
 int break_dir(char *dir, char ***dir_list){
 	//se for no root
 	if(dir == NULL || strcmp(dir, "/") == 0){
@@ -632,7 +632,7 @@ int break_dir(char *dir, char ***dir_list){
 	return num_dir;
 }
 
-/*grava a tabela fat no disco*/
+/*grava a tabela fat no disco O(1)*/
 int save_fat(){
 	FILE *fat_part = fopen("fat.part", "rb+");
 
@@ -647,7 +647,7 @@ int save_fat(){
 	return 0;
 }
 
-/*quebra uma string em varios clusters*/
+/*quebra uma string em varios clusters O(n), com n = ao numero de clusters necessários*/
 int break_str_into_clusters(char *string, data_cluster **buffer){
 	int str_size = strlen(string);
 	int num_clusters = str_size / CLUSTER_SIZE; //numero de clusters cheios
